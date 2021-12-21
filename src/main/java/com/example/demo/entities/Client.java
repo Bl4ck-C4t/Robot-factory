@@ -2,30 +2,25 @@ package com.example.demo.entities;
 
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="clients")
 public class Client {
 
 
-    public Client(String name, String lastName, int num) {
+    public Client(String name) {
         this.name = name;
-        this.lastName = lastName;
-        this.num = num;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name")
     private String name;
 
-    @Column()
-    private String lastName;
-
-    @Column()
-    private Integer num;
+    @OneToMany(mappedBy = "client")
+    public List<Order> orders;
 
     @ManyToOne()
     @JoinColumn(name = "city_id")
@@ -45,22 +40,6 @@ public class Client {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Integer getNum() {
-        return num;
-    }
-
-    public void setNum(Integer num) {
-        this.num = num;
     }
 
     public Client(){

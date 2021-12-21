@@ -12,12 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface ClientRepo extends JpaRepository<Client, Long> {
-    Optional<Client> findByNameAndLastName(String name, String name2);
+    Optional<Client> findByName(String name);
 
     @Query("SELECT c FROM Client c " +
-            "where (c.name = :firstName or :firstName is NULL) " +
-            "and " +
-            "(c.lastName = :lastName or :lastName is NULL)"
+            "where (c.name = :firstName or :firstName is NULL) "
     )
-    Page<Client> filterClients(Pageable pageable, String firstName, String lastName);
+    Page<Client> filterClients(Pageable pageable, String firstName);
 }

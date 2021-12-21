@@ -39,7 +39,7 @@ public class ClientController {
 
     @GetMapping(value = "/getClient")
     public ResponseEntity<?> getClient(String fname, String lastName){
-        Optional<Client> client = clientRepo.findByNameAndLastName(fname, lastName);
+        Optional<Client> client = clientRepo.findByName(fname);
         if(client.isPresent()){
             return ResponseEntity.ok(client);
         }
@@ -48,14 +48,14 @@ public class ClientController {
 
     @GetMapping(value = "/makeClient")
     @ResponseStatus(HttpStatus.CREATED)
-    public String createClient(String fname, String lastName, Integer number){
-        clientRepo.save(new Client(fname, lastName, number));
+    public String createClient(String fname){
+        clientRepo.save(new Client(fname));
         return "Client Created!";
     }
 
     @DeleteMapping(value = "/deleteClient")
-    public String deleteClient(HttpServletResponse response, String fname, String lastName){
-        Optional<Client> ToDelete = clientRepo.findByNameAndLastName(fname, lastName);
+    public String deleteClient(HttpServletResponse response, String fname){
+        Optional<Client> ToDelete = clientRepo.findByName(fname);
         if(ToDelete.isEmpty()){
             response.setStatus(HttpStatus.NO_CONTENT.value());
             return "Client not found :(";
@@ -66,15 +66,15 @@ public class ClientController {
 
     @GetMapping(value = "/makeTest")
     public int createEntity(){
-        Client cl = new Client("mark", "ben", 5);
+        Client cl = new Client("mark");
         clientRepo.save(cl);
         return 5;
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<?> filterClients( String fname, String lname, int currentPage, int perPage){
+    public ResponseEntity<?> filterClients( String fname, int currentPage, int perPage){
         Pageable pagable = PageRequest.of(currentPage - 1, perPage);
-        Page<Client> clientPage = clientRepo.filterClients(pagable, fname, lname);
+        Page<Client> clientPage = clientRepo.filterClients(pagable, fname);
         Map<String, Object> response = new HashMap<>();
         response.put("pages", clientPage.getTotalPages());
         response.put("elements", clientPage.getTotalElements());
