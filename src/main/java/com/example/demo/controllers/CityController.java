@@ -36,7 +36,7 @@ public class CityController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping(value = "/makeCity")
+    @PostMapping(value = "/makeCity")
     @ResponseStatus(HttpStatus.CREATED)
     public String createCity(String name){
         cityRepo.save(new City(name));

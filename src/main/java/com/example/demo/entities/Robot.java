@@ -12,6 +12,10 @@ public class Robot {
     public String name;
     public Double cost;
 
+    @ManyToOne()
+    @JoinColumn(name = "factory_id")
+    public Factory origin;
+
     @ManyToMany
     @JoinTable(
             name = "robot_parts",

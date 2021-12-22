@@ -23,16 +23,8 @@ public class Client {
     public List<Order> orders;
 
     @ManyToOne()
-    @JoinColumn(name = "city_id")
-    private City city;
-
-    public City getCity() {
-        return city;
-    }
-
-    public void setCity(City city) {
-        this.city = city;
-    }
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     public String getName() {
         return name;
