@@ -20,6 +20,14 @@ public class RobotPart {
 
     public Double value;
 
+    public RobotPart(PartType type, String name, String description, Double weight) {
+        this.type = type;
+        this.name = name;
+        this.description = description;
+        this.weight = weight;
+        this.value = 0d;
+    }
+
     public RobotPart() {
     }
 }

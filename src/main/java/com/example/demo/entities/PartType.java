@@ -10,6 +10,10 @@ public class PartType {
 
     public String name;
 
+    public PartType(String name) {
+        this.name = name;
+    }
+
     public PartType() {
     }
 }
