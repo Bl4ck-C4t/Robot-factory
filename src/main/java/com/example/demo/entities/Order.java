@@ -18,7 +18,7 @@ public class Order {
     @JoinTable(
             name = "order_robots",
             joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "robot_id")
+            inverseJoinColumns = @JoinColumn(name = "ordered_robot_id")
     )
-    public Set<Robot> robots;
+    public Set<OrderedRobot> robots;
 }

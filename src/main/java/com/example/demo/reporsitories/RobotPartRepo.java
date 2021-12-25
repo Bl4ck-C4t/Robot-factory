@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface RobotPartRepo extends JpaRepository<RobotPart, Long> {
-
+    Optional<RobotPart> findRobotPartByName(String name);
+    public void deleteRobotPartByName(String name);
 }

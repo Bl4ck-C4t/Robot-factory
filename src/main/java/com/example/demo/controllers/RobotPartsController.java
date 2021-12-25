@@ -31,6 +31,13 @@ public class RobotPartsController {
         return partTypeRepo.findAll();
     }
 
+    @DeleteMapping(value = "/deleteType")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteRobotPartType(@RequestParam String name){
+        partTypeRepo.deletePartTypeByName(name);
+        return "Deleted!";
+    }
+
     @PostMapping(value = "/makeType")
     @ResponseStatus(HttpStatus.CREATED)
     public String makeRobotPartType(@RequestParam String name){
@@ -42,6 +49,13 @@ public class RobotPartsController {
     @ResponseStatus(HttpStatus.OK)
     public List<RobotPart> getAllRobotParts(){
         return robotPartRepo.findAll();
+    }
+
+    @DeleteMapping(value = "/deletePart")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteRobotPart(@RequestParam String name){
+        robotPartRepo.deleteRobotPartByName(name);
+        return "Deleted!";
     }
 
     @PostMapping(value = "/buildPart")

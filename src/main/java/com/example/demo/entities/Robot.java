@@ -9,6 +9,10 @@ public class Robot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public Long getId() {
+        return id;
+    }
+
     public String name;
     public Double cost;
 
@@ -23,6 +27,12 @@ public class Robot {
             inverseJoinColumns = @JoinColumn(name = "robot_part_id")
     )
     public Set<RobotPart> parts;
+
+    public Robot(String name, Factory origin) {
+        this.name = name;
+        this.cost = 0d;
+        this.origin = origin;
+    }
 
     public Robot() {
     }

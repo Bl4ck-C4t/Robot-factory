@@ -14,4 +14,11 @@ public class Factory {
     @JoinColumn(name = "location_id")
     public Location location;
 
+    public Factory(String name, Location location) {
+        this.name = name;
+        this.location = location;
+    }
+
+    public Factory() {
+    }
 }

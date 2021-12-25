@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PartTypeRepo extends JpaRepository<PartType, Long> {
     public Optional<PartType> findPartTypeByName(String name);
+    public void deletePartTypeByName(String name);
 }
