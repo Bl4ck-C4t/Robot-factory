@@ -1,12 +1,17 @@
 package com.example.demo.controllers;
 
+import com.example.demo.entities.Account;
 import com.example.demo.entities.City;
 import com.example.demo.entities.Factory;
 import com.example.demo.entities.Location;
+import com.example.demo.reporsitories.AccountRepo;
 import com.example.demo.reporsitories.CityRepo;
 import com.example.demo.reporsitories.FactoryRepo;
 import com.example.demo.reporsitories.LocationRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +24,43 @@ public class ManagementController {
     private final LocationRepo locationRepo;
     private final CityRepo cityRepo;
     private final FactoryRepo factoryRepo;
+    private final AccountRepo accountRepo;
 
-    public ManagementController(LocationRepo locationRepo, CityRepo cityRepo, FactoryRepo factoryRepo) {
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    public ManagementController(LocationRepo locationRepo, CityRepo cityRepo, FactoryRepo factoryRepo, AccountRepo accountRepo) {
         this.locationRepo = locationRepo;
         this.cityRepo = cityRepo;
         this.factoryRepo = factoryRepo;
+        this.accountRepo = accountRepo;
+    }
+
+    @PostMapping(value = "/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String registerAccount(@RequestParam String username, @RequestParam String password){
+        Account acc = new Account(username, passwordEncoder.encode(password), "ROLE_CLIENT");
+        accountRepo.save(acc);
+        return "Account saved!";
+    }
+
+    @PostMapping(value = "/assignRole")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public String giveRole(@RequestParam String username, @RequestParam String role){
+        Account acc = accountRepo.findAccountByUsername(username);
+        if (acc == null)
+            return "No such account!";
+        String old_role = acc.role;
+        acc.role = "ROLE_" + role;
+        accountRepo.save(acc);
+
+        return String.format("Changed role from %s to 'ROLE_%s'!", old_role, role);
+
+    }
+
+    @GetMapping(value = "/fetchUsers")
+    public List<Account> getUsers(){
+        return accountRepo.findAll();
     }
 
     @PostMapping(value = "/makeLocation")
@@ -35,6 +72,7 @@ public class ManagementController {
         return "Location Created!";
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping(value = "/fetchLocations")
     @ResponseStatus(HttpStatus.OK)
     public List<Location> fetchLocations(){

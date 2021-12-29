@@ -2,6 +2,7 @@ package com.example.demo.entities;
 
 import javax.persistence.*;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 
 @Entity
 public class Robot {
@@ -35,5 +36,11 @@ public class Robot {
     }
 
     public Robot() {
+    }
+
+    public void updateCost() {
+        cost = 0d;
+        parts.forEach(p -> cost += p.value);
+        cost += parts.size() * 0.5;
     }
 }

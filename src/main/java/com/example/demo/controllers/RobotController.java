@@ -67,6 +67,7 @@ public class RobotController {
 
         Robot robot = roboOpt.get();
         robot.parts.add(roboPartOpt.get());
+        robot.updateCost();
         robotRepo.save(robot);
 
         return "Part added";
