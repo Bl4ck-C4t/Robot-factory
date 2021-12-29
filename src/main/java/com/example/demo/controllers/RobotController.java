@@ -31,6 +31,7 @@ public class RobotController {
     }
 
     @GetMapping(value = "/fetch")
+    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT', 'ROLE_ENGINEER', 'ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public List<Robot> getAllRobots(){
         return robotRepo.findAll();

@@ -6,6 +6,7 @@ import com.example.demo.reporsitories.CityRepo;
 import com.example.demo.reporsitories.ClientRepo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin(value = "*", maxAge = 3600)
 @RequestMapping(value = "/city")
+@PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
 public class CityController {
     private final CityRepo cityRepo;
 

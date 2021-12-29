@@ -6,6 +6,8 @@ import com.example.demo.reporsitories.AccountRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +35,7 @@ public class AccountController {
         return "Account saved!";
     }
 
-    @PostMapping(value = "/assignRole")
+    @PutMapping(value = "/assignRole")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public String giveRole(@RequestParam String username, @RequestParam String role){
         Account acc = accountRepo.findAccountByUsername(username);
@@ -48,13 +50,16 @@ public class AccountController {
     }
 
     @GetMapping(value = "/fetchUsers")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public List<Account> getUsers(){
         return accountRepo.findAll();
     }
 
     @GetMapping(value = "/logged")
-    public String giveLoggedInfo(Principal user){
-        return "Logged in as " + user.getName();
+    public String giveLoggedInfo(Authentication auth){
+        UserDetails user = (UserDetails) auth.getPrincipal();
+        return "Logged in as " + user.getUsername() + "\n with role: " + user
+                .getAuthorities().stream().findFirst().get();
     }
 
 

@@ -36,18 +36,19 @@ public class SecuirtyConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/register", "/fetchUsers").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
+            .authorizeRequests()
+            .antMatchers("/register").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .httpBasic();
 
-        http.formLogin()
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/logged", true)
-                .permitAll()
-                .and()
-                .logout().permitAll();
+        http
+            .formLogin()
+            .loginProcessingUrl("/login")
+            .defaultSuccessUrl("/logged", true)
+            .permitAll()
+            .and()
+            .logout().permitAll();
 
         http.csrf().disable().cors().disable();
 
@@ -57,7 +58,7 @@ public class SecuirtyConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
 
         auth
-                .userDetailsService(authenticationService)
-                .passwordEncoder(passwordEncoder);
+            .userDetailsService(authenticationService)
+            .passwordEncoder(passwordEncoder);
     }
 }
