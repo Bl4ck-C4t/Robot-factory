@@ -20,6 +20,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin(value = "*", maxAge = 3600)
 @RequestMapping(value = "/manage")
+@PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
 public class ManagementController {
     private final LocationRepo locationRepo;
     private final CityRepo cityRepo;
@@ -36,33 +37,6 @@ public class ManagementController {
         this.accountRepo = accountRepo;
     }
 
-    @PostMapping(value = "/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public String registerAccount(@RequestParam String username, @RequestParam String password){
-        Account acc = new Account(username, passwordEncoder.encode(password), "ROLE_CLIENT");
-        accountRepo.save(acc);
-        return "Account saved!";
-    }
-
-    @PostMapping(value = "/assignRole")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public String giveRole(@RequestParam String username, @RequestParam String role){
-        Account acc = accountRepo.findAccountByUsername(username);
-        if (acc == null)
-            return "No such account!";
-        String old_role = acc.role;
-        acc.role = "ROLE_" + role;
-        accountRepo.save(acc);
-
-        return String.format("Changed role from %s to 'ROLE_%s'!", old_role, role);
-
-    }
-
-    @GetMapping(value = "/fetchUsers")
-    public List<Account> getUsers(){
-        return accountRepo.findAll();
-    }
-
     @PostMapping(value = "/makeLocation")
     @ResponseStatus(HttpStatus.CREATED)
     public String createLocation(@RequestParam String address, @RequestParam String cityName){
@@ -72,7 +46,7 @@ public class ManagementController {
         return "Location Created!";
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping(value = "/fetchLocations")
     @ResponseStatus(HttpStatus.OK)
     public List<Location> fetchLocations(){

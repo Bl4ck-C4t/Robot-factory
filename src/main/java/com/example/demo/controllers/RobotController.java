@@ -7,6 +7,7 @@ import com.example.demo.reporsitories.FactoryRepo;
 import com.example.demo.reporsitories.RobotPartRepo;
 import com.example.demo.reporsitories.RobotRepo;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin(value = "*", maxAge = 3600)
 @RequestMapping(value = "/robot")
+@PreAuthorize("hasAnyAuthority('ROLE_ENGINEER', 'ROLE_ADMIN')")
 public class RobotController {
 
     private final RobotRepo robotRepo;
