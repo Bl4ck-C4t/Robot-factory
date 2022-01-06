@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -10,9 +11,19 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public Date deliveryTime;
+
+    @ManyToOne()
+    @JoinColumn(name = "location_id")
+    public Location address;
+
+    public boolean delivered;
+
+    public double deliveryPrice;
+
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client;
+    public Client client;
 
     @ManyToMany
     @JoinTable(

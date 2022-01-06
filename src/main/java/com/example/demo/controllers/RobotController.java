@@ -56,8 +56,8 @@ public class RobotController {
     @ResponseStatus(HttpStatus.CREATED)
     public String addRobotPart(HttpServletResponse response,
                                @PathVariable Long id, @RequestParam String partName){
-        Optional<Robot> roboOpt = robotRepo.findById(id);
-        if(roboOpt.isEmpty()) {
+        Optional<Robot> robotOpt = robotRepo.findById(id);
+        if(robotOpt.isEmpty()) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return "No robot with that id.";
         }
@@ -68,7 +68,7 @@ public class RobotController {
             return "No robot part with that name.";
         }
 
-        Robot robot = roboOpt.get();
+        Robot robot = robotOpt.get();
         robot.parts.add(roboPartOpt.get());
         robot.updateCost();
         robotRepo.save(robot);
