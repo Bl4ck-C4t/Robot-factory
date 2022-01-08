@@ -12,6 +12,7 @@ import java.util.*;
 @RestController
 @CrossOrigin(value = "*", maxAge = 3600)
 @RequestMapping(value = "/order")
+@PreAuthorize("hasAnyAuthority('ROLE_SALESMAN', 'ROLE_ADMIN')")
 public class OrderController {
 
     private final OrderRepo orderRepo;
@@ -29,7 +30,6 @@ public class OrderController {
     }
 
     @GetMapping(value = "/fetch")
-    @PreAuthorize("hasAnyAuthority('ROLE_ENGINEER', 'ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public List<Order> getAllOrders(){
         return orderRepo.findAll();
@@ -70,6 +70,7 @@ public class OrderController {
             orderedRobot.robot = robotOpt.get();
             orderedRobotRepo.save(orderedRobot);
             newOrderedRobots.add(orderedRobot);
+            index++;
         }
         Order newOrder = new Order();
         newOrder.deliveryTime = deliveryTime;
@@ -102,8 +103,10 @@ public class OrderController {
 
         Order order = orderOpt.get();
         Robot robot = robotOpt.get();
-        Optional<OrderedRobot> orderRobotOpt = order.robots.stream().filter((orderedRobot)->orderedRobot.robot.getId() == robot.getId()).findFirst();
-        if(orderRobotOpt.isEmpty()){
+        Optional<OrderedRobot> orderRobotOpt = order.robots.stream()
+                .filter((orderedRobot)-> Objects.equals(orderedRobot.robot.getId(), robot.getId()))
+                .findFirst();
+        if(orderRobotOpt.isPresent()){
             orderRobotOpt.get().quantity++;
         }
         else{

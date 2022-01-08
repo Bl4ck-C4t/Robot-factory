@@ -1,5 +1,7 @@
 package com.example.demo.entities;
 
+import org.springframework.lang.NonNull;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,7 +20,7 @@ public class City {
         this.cityName = cityName;
     }
 
-    @Column(name = "cityName")
+    @Column(name = "cityName", nullable = false)
     private String cityName;
 
     public String getCityName() {
