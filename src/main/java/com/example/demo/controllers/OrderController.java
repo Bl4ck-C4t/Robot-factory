@@ -83,4 +83,38 @@ public class OrderController {
 
         return "Order created.";
     }
+
+    @PutMapping(value = "{orderId}/addRobot")
+    @ResponseStatus(HttpStatus.CREATED)
+    public String addRobot(HttpServletResponse response,
+                               @PathVariable Long orderId, @RequestParam String robotName){
+        Optional<Order> orderOpt = orderRepo.findById(orderId);
+        if(orderOpt.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return "No order with that id.";
+        }
+
+        Optional<Robot> robotOpt = robotRepo.findRobotByName(robotName);
+        if(robotOpt.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return "No robot with that name.";
+        }
+
+        Order order = orderOpt.get();
+        Robot robot = robotOpt.get();
+        Optional<OrderedRobot> orderRobotOpt = order.robots.stream().filter((orderedRobot)->orderedRobot.robot.getId() == robot.getId()).findFirst();
+        if(orderRobotOpt.isEmpty()){
+            orderRobotOpt.get().quantity++;
+        }
+        else{
+            OrderedRobot orderedRobot = new OrderedRobot();
+            orderedRobot.robot = robot;
+            orderedRobot.quantity = 1;
+            order.robots.add(orderedRobot);
+        }
+
+        orderRepo.save(order);
+
+        return "Robot added";
+    }
 }
