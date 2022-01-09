@@ -120,4 +120,17 @@ public class OrderController {
 
         return "Robot added";
     }
+
+    @DeleteMapping(value = "/delete")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
+    public String deleteOrder(HttpServletResponse response, @RequestParam Long orderId){
+        Optional<Order> orderOpt = orderRepo.findOrderById(orderId);
+        if (orderOpt.isEmpty()) {
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+            return "No such order!";
+        }
+        orderRepo.delete(orderOpt.get());
+        return "Order deleted!";
+    }
 }
