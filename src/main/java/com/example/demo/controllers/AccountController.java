@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.List;
 
@@ -35,6 +36,19 @@ public class AccountController {
         return "Account saved!";
     }
 
+    @DeleteMapping(value = "/delete")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
+    public String deleteAccount(HttpServletResponse response, @RequestParam String username){
+        Account acc = accountRepo.findAccountByUsername(username);
+        if (acc == null) {
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+            return "No such account!";
+        }
+        accountRepo.delete(acc);
+        return "Account deleted!";
+    }
+
     @PutMapping(value = "/assignRole")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public String giveRole(@RequestParam String username, @RequestParam String role){
@@ -46,7 +60,18 @@ public class AccountController {
         accountRepo.save(acc);
 
         return String.format("Changed role from %s to 'ROLE_%s'!", old_role, role);
+    }
 
+    @PutMapping(value = "/updatePassword")
+    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
+    public String updatePassword(@RequestParam String username, @RequestParam String password){
+        Account acc = accountRepo.findAccountByUsername(username);
+        if (acc == null)
+            return "No such account!";
+        acc.password = passwordEncoder.encode(password);
+        accountRepo.save(acc);
+
+        return "Password updated!";
     }
 
     @GetMapping(value = "/fetchUsers")

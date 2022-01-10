@@ -1,10 +1,12 @@
 package com.example.demo.controllers;
 
+import com.example.demo.entities.Account;
 import com.example.demo.entities.PartType;
 import com.example.demo.entities.Robot;
 import com.example.demo.entities.RobotPart;
 import com.example.demo.reporsitories.PartTypeRepo;
 import com.example.demo.reporsitories.RobotPartRepo;
+import com.example.demo.reporsitories.RobotRepo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,5 +76,17 @@ public class RobotPartsController {
         robotPartRepo.save(new RobotPart(type.get(), name, desc, weight));
 
         return "Part created!";
+    }
+
+    @PutMapping(value = "/updatePartName")
+    public String updatePartName(@RequestParam String oldPartName, @RequestParam String newPartName){
+        Optional<RobotPart> robotPartOpt = robotPartRepo.findRobotPartByName(oldPartName);
+        if (robotPartOpt.isEmpty())
+            return "No such part!";
+        RobotPart robotPart = robotPartOpt.get();
+        robotPart.name = newPartName;
+        robotPartRepo.save(robotPart);
+
+        return "Part name updated!";
     }
 }

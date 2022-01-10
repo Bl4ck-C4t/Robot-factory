@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.entities.Factory;
+import com.example.demo.entities.Order;
 import com.example.demo.entities.Robot;
 import com.example.demo.entities.RobotPart;
 import com.example.demo.reporsitories.FactoryRepo;
@@ -74,5 +75,18 @@ public class RobotController {
         robotRepo.save(robot);
 
         return "Part added";
+    }
+
+    @DeleteMapping(value = "/delete")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
+    public String deleteRobot(HttpServletResponse response, @RequestParam String robotName){
+        Optional<Robot> robotOpt = robotRepo.findRobotByName(robotName);
+        if (robotOpt.isEmpty()) {
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+            return "No such robot!";
+        }
+        robotRepo.delete(robotOpt.get());
+        return "Robot deleted!";
     }
 }
