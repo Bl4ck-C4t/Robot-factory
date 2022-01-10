@@ -1,5 +1,7 @@
 package com.example.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -10,6 +12,10 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    public Long getId() {
+        return id;
+    }
 
     public Date deliveryTime;
 
@@ -23,7 +29,12 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
-    public Client client;
+
+    private Client client;
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
 
     @ManyToMany
     @JoinTable(
@@ -32,4 +43,10 @@ public class Order {
             inverseJoinColumns = @JoinColumn(name = "ordered_robot_id")
     )
     public Set<OrderedRobot> robots;
+
+    public void updatePrice(){
+        deliveryPrice = 0;
+        robots.forEach(robo -> deliveryPrice += robo.robot.cost * robo.quantity);
+        deliveryPrice += robots.size() * 2;
+    }
 }

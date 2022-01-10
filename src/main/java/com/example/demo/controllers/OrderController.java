@@ -16,17 +16,10 @@ import java.util.*;
 public class OrderController {
 
     private final OrderRepo orderRepo;
-    private final ClientRepo clientRepo;
-    private final RobotRepo robotRepo;
-    private final OrderedRobotRepo orderedRobotRepo;
-    private final LocationRepo locationRepo;
 
-    public OrderController(OrderRepo orderRepo, ClientRepo clientRepo, RobotRepo robotRepo, OrderedRobotRepo orderedRobotRepo, LocationRepo locationRep) {
+
+    public OrderController(OrderRepo orderRepo) {
         this.orderRepo = orderRepo;
-        this.clientRepo = clientRepo;
-        this.robotRepo = robotRepo;
-        this.orderedRobotRepo = orderedRobotRepo;
-        this.locationRepo = locationRep;
     }
 
     @GetMapping(value = "/fetch")
@@ -35,89 +28,20 @@ public class OrderController {
         return orderRepo.findAll();
     }
 
-    @PostMapping(value = "/makeOrder")
-    @ResponseStatus(HttpStatus.CREATED)
-    public String makeOrder(HttpServletResponse response,
-                            @RequestParam Date deliveryTime,
-                            @RequestParam String clientName,
-                            @RequestParam double deliveryPrice,
-                            @RequestParam List<Long> robotIds,
-                            @RequestParam List<Integer> robotQuantities,
-                            @RequestParam String city,
-                            @RequestParam String address ){
-        Optional<Client> clientOpt = clientRepo.findByName(clientName);
-        if(clientOpt.isEmpty()){
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return "No such client!";
+    @PutMapping(value = "/{order_id}/changePrice")
+    @ResponseStatus(HttpStatus.OK)
+    public String getAllOrders(@PathVariable Long order_id, @RequestParam Double price){
+        Optional<Order> order = orderRepo.findById(order_id);
+        if(order.isPresent()){
+            order.get().deliveryPrice = price;
+            orderRepo.save(order.get());
+            return "Price changed";
         }
-        Optional<Location> locationOpt = locationRepo.getLocationByCityAndAddress(city, address);
-        if(locationOpt.isEmpty()){
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return "No such location!";
-        }
-        int index = 0;
-        Set<OrderedRobot> newOrderedRobots = new HashSet<>();
-        for (Long robot_id: robotIds){
-            Integer quantity = robotQuantities.get(index);
+        return "No such order.";
 
-            Optional<Robot> robotOpt = robotRepo.findById(robot_id);
-            if(robotOpt.isEmpty()) {
-                response.setStatus(HttpStatus.NOT_FOUND.value());
-                return "No robot with that id.";
-            }
-            OrderedRobot orderedRobot = new OrderedRobot();
-            orderedRobot.quantity = quantity;
-            orderedRobot.robot = robotOpt.get();
-            orderedRobotRepo.save(orderedRobot);
-            newOrderedRobots.add(orderedRobot);
-            index++;
-        }
-        Order newOrder = new Order();
-        newOrder.deliveryTime = deliveryTime;
-        newOrder.address = locationOpt.get();
-        newOrder.client = clientOpt.get();
-        newOrder.delivered = false;
-        newOrder.deliveryPrice = deliveryPrice;
-        newOrder.robots = newOrderedRobots;
-
-        orderRepo.save(newOrder);
-
-        return "Order created.";
     }
 
-    @PutMapping(value = "{orderId}/addRobot")
-    @ResponseStatus(HttpStatus.CREATED)
-    public String addRobot(HttpServletResponse response,
-                               @PathVariable Long orderId, @RequestParam String robotName){
-        Optional<Order> orderOpt = orderRepo.findById(orderId);
-        if(orderOpt.isEmpty()) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return "No order with that id.";
-        }
 
-        Optional<Robot> robotOpt = robotRepo.findRobotByName(robotName);
-        if(robotOpt.isEmpty()) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return "No robot with that name.";
-        }
 
-        Order order = orderOpt.get();
-        Robot robot = robotOpt.get();
-        Optional<OrderedRobot> orderRobotOpt = order.robots.stream()
-                .filter((orderedRobot)-> Objects.equals(orderedRobot.robot.getId(), robot.getId()))
-                .findFirst();
-        if(orderRobotOpt.isPresent()){
-            orderRobotOpt.get().quantity++;
-        }
-        else{
-            OrderedRobot orderedRobot = new OrderedRobot();
-            orderedRobot.robot = robot;
-            orderedRobot.quantity = 1;
-            order.robots.add(orderedRobot);
-        }
 
-        orderRepo.save(order);
-
-        return "Robot added";
-    }
 }

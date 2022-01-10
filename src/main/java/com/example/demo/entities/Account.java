@@ -1,9 +1,8 @@
 package com.example.demo.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import javax.persistence.*;
 
 @Entity
 public class Account {
@@ -14,6 +13,14 @@ public class Account {
     public String username;
     public String password;
     public String role;
+
+    @OneToOne(mappedBy = "account")
+    @JsonIgnoreProperties("account")
+    private Client client;
+
+    public Client getClient() {
+        return client;
+    }
 
     public Account(String username, String password, String role) {
         this.username = username;
