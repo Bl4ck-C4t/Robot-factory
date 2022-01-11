@@ -25,7 +25,7 @@ public class RobotPart {
         this.name = name;
         this.description = description;
         this.weight = weight;
-        this.value = 0d;
+        this.value = (double)weight/2;
     }
 
     public RobotPart() {

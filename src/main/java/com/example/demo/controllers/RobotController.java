@@ -54,7 +54,6 @@ public class RobotController {
     }
 
     @PutMapping(value = "{id}/addPart")
-    @ResponseStatus(HttpStatus.CREATED)
     public String addRobotPart(HttpServletResponse response,
                                @PathVariable Long id, @RequestParam String partName){
         Optional<Robot> robotOpt = robotRepo.findById(id);
@@ -73,13 +72,15 @@ public class RobotController {
         robot.parts.add(roboPartOpt.get());
         robot.updateCost();
         robotRepo.save(robot);
-
+        response.setStatus(HttpStatus.CREATED.value());
+        if(roboPartOpt.get().name.contains("tea")){
+            response.setStatus(HttpStatus.I_AM_A_TEAPOT.value());
+        }
         return "Part added";
     }
 
     @DeleteMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAnyAuthority('ROLE_CLIENT')")
     public String deleteRobot(HttpServletResponse response, @RequestParam String robotName){
         Optional<Robot> robotOpt = robotRepo.findRobotByName(robotName);
         if (robotOpt.isEmpty()) {
@@ -89,4 +90,18 @@ public class RobotController {
         robotRepo.delete(robotOpt.get());
         return "Robot deleted!";
     }
+
+    @PutMapping(value = "/{part_id}/changeValue")
+    @ResponseStatus(HttpStatus.OK)
+    public String changePartValye(HttpServletResponse response, @PathVariable Long part_id, Double value){
+        Optional<RobotPart> roboPartOpt = robotPartRepo.findById(part_id);
+        if(roboPartOpt.isEmpty()) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return "No robot part with that name.";
+        }
+        roboPartOpt.get().value = value;
+        robotPartRepo.save(roboPartOpt.get());
+        return "Price updated";
+    }
+
 }
